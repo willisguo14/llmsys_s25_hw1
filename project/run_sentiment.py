@@ -201,7 +201,7 @@ class SentenceSentimentTrain:
                 out=None
                 
                 # BEGIN ASSIGN1_4
-                # TODO
+
                 # 1. Create x and y using minitorch.tensor function through our CudaKernelOps backend
                 # 2. Set requires_grad=True for x and y
                 # 3. Get the model output (as out)
@@ -209,7 +209,29 @@ class SentenceSentimentTrain:
                 # 5. Call backward function of the loss
                 # 6. Use Optimizer to take a gradient step
                 
-                raise NotImplementedError
+                x = minitorch.tensor(
+                    X_train[example_num : example_num + batch_size],
+                    backend=BACKEND
+                )
+                y = minitorch.tensor(
+                    y_train[example_num : example_num + batch_size],
+                    backend=BACKEND
+                )
+
+                # FIXME: why? 
+                x.requires_grad_(True)
+                y.requires_grad_(True)
+
+                out = model(x)
+
+                prob = (y * out) + (y - 1) * (out - 1) # NOTE: (float-tensor) doesn't work
+                loss = -(prob.log() / y.shape[0]).sum()
+
+
+                loss.view(1).backward() # FIXME: is reshape necessary
+                optim.step()
+                optim.zero_grad() # FIXME: not in the instructions but necessary?
+
                 # END ASSIGN1_4
                 
                 
@@ -225,13 +247,19 @@ class SentenceSentimentTrain:
                 model.eval()
                 
                 # BEGIN ASSIGN1_4
-                # TODO
+
                 # 1. Create x and y using minitorch.tensor function through our CudaKernelOps backend
                 # 2. Get the output of the model
                 # 3. Obtain validation predictions using the get_predictions_array function, and add to the validation_predictions list
                 # 4. Obtain the validation accuracy using the get_accuracy function, and add to the validation_accuracy list
                 
-                raise NotImplementedError
+                x = minitorch.tensor(X_val, backend=BACKEND)
+                y = minitorch.tensor(y_val, backend=BACKEND)
+
+                out = model(x)
+
+                validation_predictions += get_predictions_array(y, out)
+                validation_accuracy.append(get_accuracy(validation_predictions))
                 
                 # END ASSIGN1_4
                 
