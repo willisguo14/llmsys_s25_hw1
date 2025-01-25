@@ -51,7 +51,7 @@ class Linear(minitorch.Module):
         # 4. Add self.bias
         # HINT: You can use the view function of minitorch.tensor for reshape
 
-        # FIXME: why reshape?
+        # FIXME: i don't think reshape is necessary
         return (x.view(batch, in_size) @ self.weights.value.view(in_size, self.out_size)).view(batch, self.out_size) + self.bias.value
     
         # END ASSIGN1_3
@@ -228,9 +228,9 @@ class SentenceSentimentTrain:
                 loss = -(prob.log() / y.shape[0]).sum()
 
 
-                loss.view(1).backward() # FIXME: is reshape necessary
+                loss.backward() 
                 optim.step()
-                optim.zero_grad() # FIXME: not in the instructions but necessary?
+                optim.zero_grad()
 
                 # END ASSIGN1_4
                 
